@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Application xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="DemoAPP.App">
+    <Application.Resources>
+        <Style x:Key="EntryFrameStyle" TargetType="Frame">
+            <Setter Property="CornerRadius" Value="3" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0,2,0,0" />
+            <Setter Property="HeightRequest" Value="50" />
+            <Setter Property="HasShadow" Value="False" />
+            <Setter Property="BorderColor" Value="#9aaed1" />
+        </Style>
+        <Style
+        x:Key="EntryStackStyle"
+        
+        TargetType="StackLayout">
+            <Setter Property="Orientation" Value="Horizontal" />
+            <Setter Property="Spacing" Value="15" />
+            <Setter Property="Padding" Value="10,0,10,0" />
+        </Style>
+        <Style x:Key="CustomEntry" TargetType="Entry">
+            <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+            <Setter Property="VerticalOptions" Value="CenterAndExpand" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="TextColor" Value="#485365" />
+            <Setter Property="PlaceholderColor" Value="#737880" />
+            <Setter Property="Margin" Value="15,0,0,0">
+            </Setter>
+        </Style>
+
+        <Style x:Key="ErrorMessageLabelStyle"  TargetType="Label">
+            <Setter Property="TextColor" Value="Red"></Setter>
+            <Setter Property="FontSize" Value="14"></Setter>
+            <Setter Property="Padding" Value="0,0,0,0"></Setter>
+            <Setter Property="VerticalOptions" Value="StartAndExpand"></Setter>
+        </Style>
+    </Application.Resources>
+</Application>
