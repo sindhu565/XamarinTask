@@ -21,6 +21,7 @@ namespace DemoAPP.Views
             InitializeComponent();
 
             BindingContext = _viewModel;
+           // picker.ShowDividers = ShowDividers.None
         }
 
 
@@ -32,9 +33,7 @@ namespace DemoAPP.Views
 
                 var details = (UserDetailsTable)BindingContext;
                 details.userName = _viewModel.UserName;
-                details.MobileNumber = _viewModel.MobileNumber;
-                details.Email = _viewModel.Email;
-                details.designation = _viewModel.Designation;
+                details.gender = _viewModel.Gender;
                 await App.Database.SaveNoteAsync(details);
                 await Navigation.PopAsync();
             }
@@ -48,30 +47,25 @@ namespace DemoAPP.Views
 
         private void UserName_TextChanged(object sender, TextChangedEventArgs e)
         {
+           
             _viewModel.IsVisibleUserNameErrorMessage = false;
         }
 
-        
-        private void Desigination_TextChanged(object sender, TextChangedEventArgs e)
+        private void picker_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _viewModel.IsVisibileDesignationErrmsg = false;
+              var picker = (Picker)sender;
+                int selectedIndex = picker.SelectedIndex;
+
+                if (selectedIndex != -1)
+                {
+                   _viewModel.Gender = (string)picker.ItemsSource[selectedIndex];
+                }
+            
         }
 
-       
-      
-
-
-        private void MobileNunber(object sender, TextChangedEventArgs e)
+        private void TapGestureRecognizer_Tapped(object sender, EventArgs e)
         {
-            _viewModel.IsMobileNoErrorMessageVisible = false;
-        }
-
-
-        private void Email(object sender, TextChangedEventArgs e)
-        {
-          
-            _viewModel.IsVisibleMailErrorMessage = false;
-
+            _viewModel.TakePicture();
         }
     }
 }

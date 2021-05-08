@@ -1,4 +1,5 @@
 ﻿using DemoAPP.DBFolder;
+using DemoAPP.Views;
 using System;
 using System.IO;
 using Xamarin.Forms;
@@ -25,7 +26,11 @@ namespace DemoAPP
         {
             InitializeComponent();
 
-            MainPage = new NavigationPage(new MainPage());
+            MainPage = new NavigationPage(new RegisterPage())
+            {
+                BarBackgroundColor = Color.FromHex("#ff5300"),
+                BarTextColor = Color.White,
+            };
         }
 
         protected override void OnStart()

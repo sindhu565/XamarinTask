@@ -1,11 +1,16 @@
 ﻿using DemoAPP.DBFolder;
+using DemoAPP.Views;
 using Plugin.Media;
+using Plugin.Media.Abstractions;
+using Plugin.Permissions;
+using Plugin.Permissions.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace DemoAPP.ViewModels
@@ -19,17 +24,20 @@ namespace DemoAPP.ViewModels
             return _instance;
 
         }
+        private ImageSource imageSource;
+        private MediaFile file;
+
         public RegisterPageViewModel()
         {
 
 
-        } 
+        }
         #endregion
 
         #region Commands
         public ICommand TakePictureCommand => new Command(async () => await TakePicture());
         public ICommand SaveButtonCommand => new Command(async () => await onSaveButtonClick());
-        public ICommand CancelCommand => new Command(async () =>  OnCancelClick());
+        public ICommand CancelCommand => new Command(async () => OnCancelClick());
         #endregion
 
         #region PublicMethods
@@ -48,16 +56,18 @@ namespace DemoAPP.ViewModels
 
                     UserDetailsTable details = new UserDetailsTable();
                     details.userName = UserName;
-                    details.MobileNumber = MobileNumber;
-                    details.Email = Email;
-                    details.designation = Designation;
                     details.thumbNail = ThumbNail;
+                    details.gender = gender;
                     await App.Database.SaveNoteAsync(details);
                     var action = await App.Current.MainPage.DisplayActionSheet("Information", "Done", null, "Your details saved in DB");
                     if (action != null)
                     {
                         clearUserDetials();
                     }
+
+                    // to show OtherPage and be able to go back
+                    await (Application.Current.MainPage as NavigationPage).PushAsync(new UserDetails());
+
                 }
 
             }
@@ -70,64 +80,114 @@ namespace DemoAPP.ViewModels
         public void clearUserDetials()
         {
             UserName = string.Empty;
-            MobileNumber = string.Empty;
-            Designation = string.Empty;
-            Email = string.Empty;
             UserImage = string.Empty;
             ThumbNail = string.Empty;
         }
 
         public async Task TakePicture()
         {
-            await CrossMedia.Current.Initialize();
+            //await CrossMedia.Current.Initialize();
+            //try
+            //{
+
+            //    var action = await App.Current.MainPage.DisplayActionSheet("Choose Camera", "Cancel", null, "Camera", "Gallery");
+            //    if (action == "Gallery")
+            //    {
+
+            //        var file = await Plugin.Media.CrossMedia.Current.PickPhotoAsync(new Plugin.Media.Abstractions.PickMediaOptions
+            //        {
+            //            PhotoSize = Plugin.Media.Abstractions.PhotoSize.Medium
+            //        });
+
+            //        if (file == null) return;
+            //        UserImage = ImageSource.FromStream(() =>
+            //        {
+            //            var stream = file.GetStream();
+            //            return stream;
+            //        });
+
+
+            //    }
+
+
+            //    else
+            //    {
+            //        await CrossMedia.Current.Initialize();
+
+            //        if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
+            //        {
+            //            // await DisplayAlert("No Camera", ":( No camera available.", "OK");
+            //            return;
+            //        }
+            //        var file = await CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions
+            //        {
+            //            PhotoSize = Plugin.Media.Abstractions.PhotoSize.Medium
+            //        });
+            //        if (file == null)
+            //            return;
+            //        UserImage = ImageSource.FromStream(() =>
+            //        {
+            //            var stream = file.GetStream();
+            //            return stream;
+            //        });
+
+
+            //    }
             try
             {
+                await CrossMedia.Current.Initialize();
 
-                var action = await App.Current.MainPage.DisplayActionSheet("Choose Camera", "Cancel", null, "Camera", "Gallery");
-                if (action == "Gallery")
+                if (CrossMedia.Current.IsCameraAvailable && CrossMedia.Current.IsTakePhotoSupported)
                 {
+                    var source = await App.Current.MainPage.DisplayActionSheet("Choose Camera", "Cancel", null, "Camera", "Gallery");
 
-                    var file = await Plugin.Media.CrossMedia.Current.PickPhotoAsync(new Plugin.Media.Abstractions.PickMediaOptions
+                    if (source == "Cancel")
                     {
-                        PhotoSize = Plugin.Media.Abstractions.PhotoSize.Medium
-                    });
 
-                    if (file == null) return;
-                    UserImage = ImageSource.FromStream(() =>
+                        file = null;
+                    }
+                    else if (source == "Gallery")
                     {
-                        var stream = file.GetStream();
-                        return stream;
-                    });
 
+                        file = await CrossMedia.Current.PickPhotoAsync(new PickMediaOptions
+                        {
+                            PhotoSize = PhotoSize.Small
+                        });
+                       
+                    }
+                    else if (source == "Camera")
+                    {
 
+                        
+                            file = await CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions
+                            {
+                                Name = "prueba.jpeg",
+                                PhotoSize = PhotoSize.Small,
+                                SaveToAlbum = true
+                            }); 
+                       
+                        
+                    }
                 }
-
-
                 else
                 {
-                    await CrossMedia.Current.Initialize();
-
-                    if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
+                    file = await CrossMedia.Current.PickPhotoAsync(new PickMediaOptions
                     {
-                        // await DisplayAlert("No Camera", ":( No camera available.", "OK");
-                        return;
-                    }
-                    var file = await CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions
-                    {
-                        PhotoSize = Plugin.Media.Abstractions.PhotoSize.Medium
+                        PhotoSize = PhotoSize.Small
                     });
-                    if (file == null)
-                        return;
-                    UserImage = ImageSource.FromStream(() =>
+                }
+
+                if (file != null)
+                {
+                    imageSource = ImageSource.FromStream(() =>
                     {
                         var stream = file.GetStream();
+                        file.Dispose();
                         return stream;
                     });
-
-
+                    UserImage = imageSource;
                 }
             }
-
 
             catch (Exception ex)
             {
@@ -138,32 +198,19 @@ namespace DemoAPP.ViewModels
         public bool ValidationsCheck()
         {
 
-            if (string.IsNullOrEmpty(userName))
+            if (string.IsNullOrEmpty(UserName))
             {
                 IsVisibleUserNameErrorMessage = true;
                 UserNameErrorMessage = "Please Enter UserName.";
             }
-            else if (string.IsNullOrEmpty(Designation))
+            else if (string.IsNullOrEmpty(Gender))
             {
 
-                IsVisibileDesignationErrmsg = true;
-                DesignationErrmsg = "Please Enter Designation.";
+                IsGenderMessageVisible = true;
+                GenderErrorMessage = "Please Select Gender.";
 
             }
-            else if (string.IsNullOrEmpty(Email))
-            {
 
-                IsVisibleMailErrorMessage = true;
-                EmailErrorMessage = "Please Enter MailId.";
-
-            }
-            else if (string.IsNullOrEmpty(MobileNumber))
-            {
-
-                IsMobileNoErrorMessageVisible = true;
-                MobileErrorMessage = "Please Enter MObileNumber.";
-
-            }
             //else if (string.IsNullOrEmpty(UserImage))
             //{
             //    ImageErrorMessage = true;
@@ -176,7 +223,7 @@ namespace DemoAPP.ViewModels
             }
 
             return default;
-        } 
+        }
         #endregion
 
         #region Models
@@ -193,42 +240,19 @@ namespace DemoAPP.ViewModels
             get { return isvisibileImageErrorMsg; }
             set { isvisibileImageErrorMsg = value; OnPropertyChanged(nameof(IsvisibileImageErrorMsg)); }
         }
-        private bool isVisibleMailErrorMessage;
-        public bool IsVisibleMailErrorMessage
-        {
-            get { return isVisibleMailErrorMessage; }
-            set { isVisibleMailErrorMessage = value; OnPropertyChanged(nameof(IsVisibleMailErrorMessage)); }
-        }
-        private string emailErrorMessage;
-        public string EmailErrorMessage
-        {
-            get { return emailErrorMessage; }
-            set { emailErrorMessage = value; OnPropertyChanged(nameof(EmailErrorMessage)); }
-        }
-        private string designationErrmsg;
-        public string DesignationErrmsg
-        {
-            get { return designationErrmsg; }
-            set { designationErrmsg = value; OnPropertyChanged(nameof(DesignationErrmsg)); }
-        }
-        private bool isVisibileDesignationErrmsg;
-        public bool IsVisibileDesignationErrmsg
-        {
-            get { return isVisibileDesignationErrmsg; }
-            set { isVisibileDesignationErrmsg = value; OnPropertyChanged(nameof(IsVisibileDesignationErrmsg)); }
-        }
 
-        private bool isMobileNoErrorMessageVisible;
-        public bool IsMobileNoErrorMessageVisible
+
+        private bool isGenderMessageVisible;
+        public bool IsGenderMessageVisible
         {
-            get { return isMobileNoErrorMessageVisible; }
-            set { isMobileNoErrorMessageVisible = value; OnPropertyChanged(nameof(IsMobileNoErrorMessageVisible)); }
+            get { return isGenderMessageVisible; }
+            set { isGenderMessageVisible = value; OnPropertyChanged(nameof(IsGenderMessageVisible)); }
         }
-        private string mobileErrorMessage;
-        public string MobileErrorMessage
+        private string genderErrorMessage;
+        public string GenderErrorMessage
         {
-            get { return mobileErrorMessage; }
-            set { mobileErrorMessage = value; OnPropertyChanged(nameof(MobileErrorMessage)); }
+            get { return genderErrorMessage; }
+            set { genderErrorMessage = value; OnPropertyChanged(nameof(GenderErrorMessage)); }
         }
 
         private string thumbNail;
@@ -257,26 +281,14 @@ namespace DemoAPP.ViewModels
             get { return userName; }
             set { userName = value; OnPropertyChanged(nameof(UserName)); }
         }
-        private string mobileNumber;
-        public string MobileNumber
+        private string gender;
+        public string Gender
         {
-            get { return mobileNumber; }
-            set { mobileNumber = value; OnPropertyChanged(nameof(MobileNumber)); }
+            get { return gender; }
+            set { gender = value; OnPropertyChanged(nameof(Gender)); }
 
         }
-        private string email;
-        public string Email
-        {
-            get { return email; }
-            set { email = value; OnPropertyChanged(nameof(Email)); }
-        }
 
-        private string designation;
-        public string Designation
-        {
-            get { return designation; }
-            set { designation = value; OnPropertyChanged(nameof(Designation)); }
-        }
 
         private bool isVisibleUserNameErrorMessage;
         public bool IsVisibleUserNameErrorMessage

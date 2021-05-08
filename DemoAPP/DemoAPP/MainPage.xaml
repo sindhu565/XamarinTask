@@ -5,13 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
             xmlns:views="clr-namespace:DemoAPP.Views"
             mc:Ignorable="d"
-             x:Class="DemoAPP.MainPage">
+             x:Class="DemoAPP.MainPage" Title="TESTING DEMO">
 
-    <TabbedPage.Children>
-        <views:RegisterPage Title="RegisterPage"/>
-        <views:UserDetails Title="UserDetails"/>
-        <views:News Title="NewsFeeding"/>
-        
-    </TabbedPage.Children>
-
+    
 </TabbedPage>

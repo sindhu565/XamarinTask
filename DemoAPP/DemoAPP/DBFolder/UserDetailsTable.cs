@@ -10,9 +10,7 @@ namespace DemoAPP.DBFolder
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
         public string userName { get; set; }
-        public string designation { get; set; }
-        public string Email { get; set; }
-        public string MobileNumber { get; set; }
+        public string gender { get; set; }
         public string thumbNail { get; set; }
 
     }

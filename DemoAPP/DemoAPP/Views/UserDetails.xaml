@@ -5,8 +5,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:custom="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
              xmlns:ffimage="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+              
              mc:Ignorable="d"
-             x:Class="DemoAPP.Views.UserDetails">
+             x:Class="DemoAPP.Views.UserDetails" Title="User Details">
     <ContentPage.Content>
         <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
             <CollectionView x:Name="listView">
@@ -28,16 +29,33 @@
                                  
                                 </Grid.ColumnDefinitions>
                             </Grid>
-                            <Frame Margin="10,10,10,0" BackgroundColor="White" BorderColor="Gray"  Padding="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                            <Frame Margin="10,5,10,5" BackgroundColor="White" BorderColor="Green"  Padding="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
                                 <StackLayout Orientation="Horizontal" >
-                                    <StackLayout Margin="60,10,0,0"  Grid.Row="0"   >
-                                        <custom:CircleImage  Aspect="AspectFit" HeightRequest="80" WidthRequest="80" Source="defaultusericon.jpg"/>
-                                    </StackLayout>
-                                    <StackLayout Grid.Row="0" Margin="30,10,0,10" HorizontalOptions="End" VerticalOptions="End" Grid.Column="1" >
-                                        <Label Text="{Binding MobileNumber}"/>
-                                        <Label Text="{Binding MobileNumber}"/>
-                                        <Label Text="{Binding MobileNumber}"/>
-                                        <Label Text="{Binding MobileNumber}"/>
+                                   
+                                        <StackLayout  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  Margin="40,10,0,10" Padding="0" >
+                                            <custom:CircleImage BorderColor="Green" BorderThickness="1" Source="UserImage.png" WidthRequest="80" HeightRequest="80" Aspect="AspectFit" VerticalOptions="Center" HorizontalOptions="Center" />
+                                        </StackLayout>
+
+                                    
+                                    <StackLayout Grid.Row="1" Margin="30,0,0,0" HorizontalOptions="Center" VerticalOptions="Center" Grid.Column="1" >
+                                        <Label >
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="Name: " TextColor="Green"></Span>
+                                                    <Span Text="{Binding userName}" TextColor="Red"/>
+                                                </FormattedString>
+                                                    
+                                            </Label.FormattedText>
+</Label>
+                                        <Label >
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="Gender: " TextColor="Green"></Span>
+                                                    <Span Text="{Binding gender}" TextColor="Red"/>
+                                                </FormattedString>
+
+                                            </Label.FormattedText>
+                                            </Label>
                                     </StackLayout>
                                 </StackLayout>
                             </Frame>
